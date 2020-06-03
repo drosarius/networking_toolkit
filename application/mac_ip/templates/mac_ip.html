@@ -1,0 +1,69 @@
+{% extends 'base.html' %}
+
+
+
+<head>
+    {% block title %}
+    <title>MAC to IP!</title>
+    {% endblock title %}
+</head>
+
+        {% block jumbotron_content %}
+                <h1 class="display-4">MAC to IP</h1>
+                <nav aria-label="breadcrumb">
+                    <ol class="breadcrumb">
+                        <li class="breadcrumb-item"><a href="/">Home</a></li>
+                        <li class="breadcrumb-item active" aria-current="page">MAC to IP</li>
+                    </ol>
+                </nav>
+        {% endblock jumbotron_content %}
+{% block content %}
+
+
+
+
+<div>
+
+    <form method="POST" action = "" id="mac-ip-form" enctype="multipart/form-data">
+                {{ form.hidden_tag() }}
+  <div class="form-group">
+      <label>MAC Table</label>
+      {{ form.mac_inputfile(class="btn btn-outline-info", id="macinput") }}
+      <label>ARP Table</label>
+      {{ form.arp_inputfile(class="btn btn-outline-info", id="arpinput") }}
+  </div>
+  <div class="form-group">
+      {{ form.submit(class="btn btn-outline-info") }}
+<!--    <button type="button" class="btn btn-outline-info" data-export="export" onclick= "create_csv()">Export</button>-->
+  </div>
+
+</form>
+
+</div>
+
+<div>
+
+            {{ table|safe }}
+
+
+</div>
+
+
+{% endblock content %}
+
+  {% block js %}
+
+<script type="text/javascript">
+$(document).ready( function () {
+    $('#mac_ip_vendor_table').DataTable({
+                 dom: 'Bfrtip',
+                 buttons: ['csvHtml5']
+    }
+
+    );
+} );
+</script>
+
+  {% endblock js %}
+
+

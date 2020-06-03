@@ -1,0 +1,87 @@
+{% extends 'base.html' %}
+
+
+{% block jumbotron_content %}
+                <h1 class="display-4">Batfish Analyzer</h1>
+                <nav aria-label="breadcrumb">
+                    <ol class="breadcrumb">
+                        <li class="breadcrumb-item"><a href="/">Home</a></li>
+                        <li class="breadcrumb-item active" aria-current="page">Batfish Analyzer</li>
+                    </ol>
+                </nav>
+        {% endblock jumbotron_content %}
+
+
+{% block content %}
+
+
+<head>
+    <meta charset="UTF-8">
+    <title>Batfish!</title>
+</head>
+
+<div>
+
+    <form method="POST" action = "" id="batfish_data-form">
+                {{ form.hidden_tag() }}
+
+    <div>
+        <label>Select Network</label>
+        <select name="network" id="network"  class="form-control form-control-lg">
+           <option value= "{{ networks[0] }}" SELECTED>{{ networks[0] }}</option>"
+           {% for network in networks[1:] %}
+           <option value= "{{ network }}" >{{ network }}</option>"
+           {% endfor %}
+       </select>
+
+    </div>
+    <div>
+      <label>New Snapshot?</label>
+      <input type="checkbox" name="is_new_snapshot" value="1" onclick="new_snapshot(this)" />
+  </div>
+   <div>
+      {{ form.snapshot_dir.label(class="form-control-label") }}
+      {{ form.snapshot_dir(class="form-control form-control-lg", id="snapshot_dir") }}
+      {{ form.snapshot_name.label(class="form-control-label") }}
+      {{ form.snapshot_name(class="form-control form-control-lg", id="snapshot_name") }}
+   </div>
+    <div>
+        <button class="btn btn-outline-info" id="set_network">Go!</button>
+    </div>
+
+</form>
+    </div>
+{% endblock content %}
+
+  {% block js %}
+<script>
+
+window.addEventListener('load', (event) => {
+    disable();
+});
+
+
+
+
+    function disable(){
+        document.getElementById("snapshot_dir").disabled = true;
+        document.getElementById("snapshot_name").disabled = true;
+
+}
+
+    function new_snapshot(snapshotCheckBox){
+    //If the checkbox has been checked
+    if(snapshotCheckBox.checked){
+        //Set the disabled property to FALSE and enable the button.
+        document.getElementById("snapshot_dir").disabled = false;
+        document.getElementById("snapshot_name").disabled = false;
+    } else{
+        //Otherwise, disable the submit button.
+        document.getElementById("snapshot_dir").disabled = true;
+        document.getElementById("snapshot_name").disabled = true;
+    }
+}
+</script>
+
+  {% endblock js %}
+

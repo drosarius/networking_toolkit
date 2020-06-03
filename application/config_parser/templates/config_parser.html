@@ -1,0 +1,115 @@
+{% extends 'base.html' %}
+
+
+
+
+        {% block jumbotron_content %}
+                <h1 class="display-4">Configuration Parser</h1>
+                <nav aria-label="breadcrumb">
+                    <ol class="breadcrumb">
+                        <li class="breadcrumb-item"><a href="/">Home</a></li>
+                        <li class="breadcrumb-item active" aria-current="page">Config Parser</li>
+                    </ol>
+                </nav>
+        {% endblock jumbotron_content %}
+
+{% block content %}
+
+
+<head>
+    <meta charset="UTF-8">
+    {% block title %}
+    <title>Configuration Parser</title>
+    {% endblock title %}
+</head>
+
+<div>
+
+    <form method="POST" action = "" id="config_parser_data-form" enctype="multipart/form-data">
+                {{ form.hidden_tag() }}
+
+   <div class="form-group">
+       <label>Select a File</label>
+      {{ form.inputfile(class="btn btn-outline-info", id="inputfile") }}
+  </div>
+
+  <div class="form-group">
+      {{ form.cli_command.label(class="form-control-label") }}
+      {{ form.cli_command(class="form-control form-control-lg", id="cli_command") }}
+  </div>
+  <div class="form-group">
+      {{ form.submit(class="btn btn-outline-info") }}
+  </div>
+        <div>
+        <label>Select Device</label>
+        <select name="device_name" id="device" onchange="get_device_info()" class="form-control form-control-lg">
+           <option value= "{{ devices[0] }}" SELECTED>{{ devices[0] }}</option>"
+           {% for device in devices[1:] %}
+           <option value= "{{ device }}" >{{ device }}</option>"
+           {% endfor %}
+       </select>
+
+    </div>
+</form>
+
+
+</div>
+
+<div id="device_data_table">
+
+            {{ table|safe }}
+
+
+
+</div>
+
+
+{% endblock content %}
+
+  {% block js %}
+
+
+<script>
+
+
+        $('#parsed_config_table').DataTable({
+                dom: 'Bfrtip',
+                buttons: ['csvHtml5'],
+        });
+
+
+
+
+            function get_device_info() {
+
+                var device = document.getElementById('device').value;
+                var command = document.getElementById('cli_command').value;
+                var data = {
+                 'device' : device,
+                 'command': command
+            };
+                $.ajax({
+                  type: 'POST',
+                  url: "{{url_for('config_parser_bp.config_parser')}}",
+                  contentType: 'application/json',
+                  data: JSON.stringify(data),
+                    success: function (res, status) {
+                var html = res;
+                var myDataTable = $("#device_data_table").html(html);
+                $('#parsed_config_table').DataTable({
+                dom: 'Bfrtip',
+                buttons: ['csvHtml5'],
+        });
+
+             },
+                error: function (res) {
+                    alert(res.status)
+                }
+                });
+
+    }
+
+</script>
+  {% endblock js %}
+
+

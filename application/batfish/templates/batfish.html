@@ -1,0 +1,86 @@
+{% extends 'base.html' %}
+{% block jumbotron_content %}
+                <h1 class="display-4">Batfish Analyzer</h1>
+                <nav aria-label="breadcrumb">
+                    <ol class="breadcrumb">
+                        <li class="breadcrumb-item"><a href="/">Home</a></li>
+                        <li class="breadcrumb-item active" aria-current="page">Batfish Analyzer</li>
+                    </ol>
+                </nav>
+        {% endblock jumbotron_content %}
+{% block content %}
+
+
+<div>
+
+    <form method="POST" action = "" id="batfish-form">
+                {{ form.hidden_tag() }}
+
+  <div class="form-group">
+      {{ form.batfish_host.label(class="form-control-label") }}
+      {% if form.batfish_host.errors %}
+        {{ form.batfish_host(class="form-control form-control-lg is-invalid") }}
+        <div class="invalid-feedback">
+            {% for error in form.batfish_host.errors %}
+                <span>{{ error }}</span>
+            {% endfor %}
+        </div>
+      {% else %}
+        {{ form.batfish_host(class="form-control form-control-lg", id="bHost", value="192.168.56.101") }}
+      {% endif %}
+  </div>
+
+  <div>
+      <label>New Network?</label>
+      <input type="checkbox" name="is_new_network" value="1" onclick="new_network(this)" />
+  </div>
+   <div>
+      {{ form.batfish_set_network.label(class="form-control-label") }}
+      {{ form.batfish_set_network(class="form-control form-control-lg", id="bSetNet") }}
+      {{ form.snapshot_dir.label(class="form-control-label") }}
+      {{ form.snapshot_dir(class="form-control form-control-lg", id="snapshot_dir") }}
+      {{ form.snapshot_name.label(class="form-control-label") }}
+      {{ form.snapshot_name(class="form-control form-control-lg", id="snapshot_name") }}
+   </div>
+  <div class="form-group">
+      {{ form.submit(class="btn btn-outline-info") }}
+  </div>
+
+
+</form>
+
+</div>
+
+
+{% endblock content %}
+
+  {% block js %}
+<script>
+window.addEventListener('load', (event) => {
+    disable();
+});
+
+    function disable(){
+        document.getElementById("snapshot_dir").disabled = true;
+        document.getElementById("snapshot_name").disabled = true;
+        document.getElementById("bSetNet").disabled = true;
+
+}
+
+    function new_network(networkCheckBox){
+    //If the checkbox has been checked
+    if(networkCheckBox.checked){
+        //Set the disabled property to FALSE and enable the button.
+        document.getElementById("snapshot_dir").disabled = false;
+        document.getElementById("snapshot_name").disabled = false;
+        document.getElementById("bSetNet").disabled = false;
+    } else{
+        //Otherwise, disable the submit button.
+        document.getElementById("snapshot_dir").disabled = true;
+        document.getElementById("snapshot_name").disabled = true;
+        document.getElementById("bSetNet").disabled = true;
+    }
+}
+</script>
+
+  {% endblock js %}

@@ -1,0 +1,74 @@
+{% extends 'base.html' %}
+
+
+{% block jumbotron_content %}
+                <h1 class="display-4">Batfish Analyzer</h1>
+                <nav aria-label="breadcrumb">
+                    <ol class="breadcrumb">
+                        <li class="breadcrumb-item"><a href="/">Home</a></li>
+                        <li class="breadcrumb-item active" aria-current="page">Batfish Analyzer</li>
+                    </ol>
+                </nav>
+        {% endblock jumbotron_content %}
+
+{% block content %}
+
+<head>
+    {% block title %}
+    <title>Batfish!</title>
+    {% endblock title %}
+</head>
+
+<div>
+
+    <form method="POST" action = "" id="batfish_data-form">
+                {{ form.hidden_tag() }}
+
+   <div>
+       <label>Select Snapshot</label>
+       <select name="snapshot" id="snapshot" class="form-control form-control-lg">
+           <option value= "{{ snapshots[0] }}" SELECTED>{{ snapshots[0] }}</option>"
+           {% for snapshot in snapshots[1:] %}
+           <option value= "{{ snapshot }}" >{{ snapshot }}</option>"
+           {% endfor %}
+       </select>
+
+   </div>
+  <div class="form-group">
+      {{ form.pick_question.label(class="form-control-label") }}
+      {{ form.pick_question(class="form-control form-control-lg", id="bHost") }}
+  </div>
+  <div class="form-group">
+      {{ form.submit(class="btn btn-outline-info") }}
+    <a href="batfish_select_network" type="button" class="btn btn-outline-info">Select a new network?</a>
+  </div>
+
+</form>
+
+
+</div>
+
+<div>
+
+            {{ table|safe }}
+
+</div>
+
+
+{% endblock content %}
+
+  {% block js %}
+
+<script type="text/javascript">
+$(document).ready( function () {
+    $('#batfishtable').DataTable({
+                 dom: 'Bfrtip',
+                 buttons: ['csvHtml5']
+    }
+
+    );
+} );
+</script>
+  {% endblock js %}
+
+

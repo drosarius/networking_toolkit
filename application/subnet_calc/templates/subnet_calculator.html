@@ -1,0 +1,198 @@
+{% extends 'base.html' %}
+
+        {% block jumbotron_content %}
+                <h1 class="display-4">Subnet Calculator</h1>
+                <nav aria-label="breadcrumb">
+                    <ol class="breadcrumb">
+                        <li class="breadcrumb-item"><a href="/">Home</a></li>
+                        <li class="breadcrumb-item active" aria-current="page">Subnet Calculator</li>
+                    </ol>
+                </nav>
+        {% endblock jumbotron_content %}
+
+{% block content %}
+
+    <head>
+        {% block title %}
+            <title>Subnet Calculator</title>
+        {% endblock title %}
+    </head>
+<div class="topnav">
+    <h5>Other great (better) subnet calculators</h5>
+  <a href="http://www.davidc.net/sites/default/subnets/subnets.html">
+One</a>
+  <a href="https://www.calculator.net/ip-subnet-calculator.html">Two</a>
+  <a href="http://www.subnet-calculator.com/">Three</a>
+</div>
+    <form method="POST" id="subnet-form">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
+  <div class="form-group">
+    <label>Subnet</label>
+    <input type="text" class="form-control" id="subnet_input" aria-describedby="subnetHelp" value="192.168.1.0/24">
+    <small id="subnetHelp" class="form-text text-muted">Ex. 192.168.1.0/24</small>
+  </div>
+  <div class="form-group">
+    <label>Split</label>
+    <input type="text" class="form-control" id="split_input" value="24">
+  </div>
+
+        <div>
+
+             <button id="update" type="submit" class="btn btn-outline-info">Update</button>
+             <button id="reset" type="button" onclick="resetForm()" class="btn btn-outline-info">Reset</button>
+             <button type="button" class="btn btn-outline-info" data-export="export" onclick= "create_csv()">Export</button>
+        </div>
+
+
+
+<br>
+<body>
+
+        <table id="subnet_table" class="table table-bordered">
+            <thead>
+            <tr>
+                <th>Network</th>
+                <th>Netmask</th>
+                <th>Wildcard</th>
+                <th>Useable IPs</th>
+                <th>Number of Hosts</th>
+                <th>Split</th>
+            </tr>
+            </thead>
+
+
+
+            <tbody id="tableData">
+
+            </tbody>
+
+        </table>
+
+        {% block js %}
+
+        <script src="https://code.jquery.com/jquery-3.4.1.min.js" integrity="sha256-CSXorXvZcTkaix6Yvo6HppcZGetbYMGWSFlBw8HfCJo=" crossorigin="anonymous"></script>
+        <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/v/bs4/dt-1.10.20/b-1.6.1/b-html5-1.6.1/b-print-1.6.1/datatables.css"/>
+        <script type="text/javascript" src="https://cdn.datatables.net/v/bs4/dt-1.10.20/b-1.6.1/b-html5-1.6.1/b-print-1.6.1/datatables.js"></script>
+        <script src="https://cdn.jsdelivr.net/npm/table2csv@1.1.4/src/table2csv.min.js"></script>
+
+        <script>
+        function resetForm() {
+            $("#subnet_table tbody tr").remove();
+        // document.getElementById("subnet-form").reset();
+        }
+        </script>
+
+        <script>
+            $("#update").on("click", function (event) {
+                let starting_subnet = document.getElementById("subnet_input").value;
+                let split_value  = document.getElementById("split_input").value;
+                let table = document.getElementById("tableData");
+                var data = {
+                 'starting_subnet' : starting_subnet,
+                 'split_value' : split_value
+            };
+            $.ajax({
+            type: "POST",
+            url: "{{url_for('subnet_calc_bp.create_subnet_table')}}",
+            contentType: 'application/json',
+            data: JSON.stringify(data),
+            dataType: 'json',
+            success: function (res, status) {
+                console.log("Yay!")
+                var jsonData = res;
+                var html = '';
+
+                Object.keys(jsonData).forEach(function(key) {
+                    var index = jsonData[key].network;
+                    html +='<tr id=' + "row-" + index + '>';
+                    html +='<td id=' + "network_cell-" + index + '>'+ jsonData[key].network + '</td>';
+                    html +='<td>'+ jsonData[key].netmask + '</td>';
+                    html +='<td>'+ jsonData[key].wildcard + '</td>';
+                    html +='<td>'+ jsonData[key].usable_ips + '</td>';
+                    html +='<td>'+ jsonData[key].num_of_hosts + '</td>';
+                    html +="<td id=' + 'split_btn-' + index + '><button type='button' id='split-btn' onclick='split_subnet(\""+ index + "\")' class='btn btn-primary btn-sm'>Split</button></td>";
+                    html +='</tr>';
+                });
+                $('#subnet_table tbody').html(html)
+
+             },
+                error: function (res) {
+                    alert(res.status)
+                }
+            });
+         return false;
+        });
+
+
+        </script>
+
+<script>
+            function split_subnet(index) {
+
+                var table = document.getElementById("tableData");
+                let new_table_row = document.getElementById("tableData").rows.namedItem("row-" + index);
+                var network_to_be_split = document.getElementById("network_cell-" + index).innerHTML;
+                table.insertRow(new_table_row.rowIndex);
+                var data = {
+                 'subnet_to_be_split': network_to_be_split
+            };
+                $.ajax({
+                    type: "POST",
+                    url: "{{url_for('subnet_calc_bp.split_subnet')}}",
+                    data: JSON.stringify(data),
+                dataType: 'json',
+            success: function (res, status) {
+                var jsonData = res;
+                var html1 = '';
+                var html2 = '';
+                var first_subnet_key = Object.keys(jsonData)[0];
+                var first_subnet_value = jsonData[first_subnet_key];
+                var second_subnet_key = Object.keys(jsonData)[1];
+                var second_subnet_value = jsonData[second_subnet_key];
+
+                var index1 = first_subnet_value.network;
+                var index2 = second_subnet_value.network;
+                html1 +='<tr id=' + "row-" + index1 + '>';
+                html1 +='<td id=' + "network_cell-" + index1 + '>'+ first_subnet_value.network + '</td>';
+                html1 +='<td>'+ first_subnet_value.netmask + '</td>';
+                html1 +='<td>'+ first_subnet_value.wildcard + '</td>';
+                html1 +='<td>'+ first_subnet_value.usable_ips + '</td>';
+                html1 +='<td>'+ first_subnet_value.num_of_hosts + '</td>';
+                html1 +="<td id=' + 'split_btn-' + index1 + '><button type='button' id='split-btn' onclick='split_subnet(\""+ index1 + "\")' class='btn btn-primary btn-sm'>Split</button></td>";
+                html1 +='</tr>';
+
+                html2 +='<tr id=' + "row-" + index2 + '>';
+                html2 +='<td id=' + "network_cell-" + index2 + '>'+ second_subnet_value.network + '</td>';
+                html2 +='<td>'+ second_subnet_value.netmask + '</td>';
+                html2 +='<td>'+ second_subnet_value.wildcard + '</td>';
+                html2 +='<td>'+ second_subnet_value.usable_ips + '</td>';
+                html2 +='<td>'+ second_subnet_value.num_of_hosts + '</td>';
+                html2 +="<td id=' + 'split_btn-' + index2 + '><button type='button' id='split-btn' onclick='split_subnet(\""+ index2 + "\")' class='btn btn-primary btn-sm'>Split</button></td>";
+                html2 +='</tr>';
+                var current_row_index = new_table_row.rowIndex;
+                table.deleteRow(current_row_index - 1);
+                $('#subnet_table tbody tr').eq(current_row_index - 1).after(html1);
+                $('#subnet_table tbody tr').eq(current_row_index).after(html2);
+
+
+
+
+             },
+                error: function (res) {
+                    alert(res.status)
+                }
+            });
+         return false;
+        }
+
+            function create_csv(){
+            $("#subnet_table").table2csv({
+                filename:'subnet_table.csv'
+            })}
+
+        </script>
+{% endblock js %}
+
+</body>
+
+{% endblock content %}

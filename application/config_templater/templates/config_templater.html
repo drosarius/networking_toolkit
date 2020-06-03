@@ -1,0 +1,181 @@
+{% extends 'base.html' %}
+
+
+        {% block jumbotron_content %}
+                <h1 class="display-4">Configuration Templater</h1>
+                <nav aria-label="breadcrumb">
+                    <ol class="breadcrumb">
+                        <li class="breadcrumb-item"><a href="/">Home</a></li>
+                        <li class="breadcrumb-item active" aria-current="page">Config Templater</li>
+                    </ol>
+                </nav>
+        {% endblock jumbotron_content %}
+
+{% block content %}
+
+
+
+<head>
+    <meta charset="UTF-8">
+    {% block title %}
+            <title>Configuration Templater!</title>
+        {% endblock title %}
+
+</head>
+
+
+<style>
+    textarea {
+      width: 100%;
+      height: auto;
+    }
+
+    input[type="file"] {
+    display: none;
+}
+#custom-file-upload {
+    /*border: 1px solid #ccc;*/
+    /*display: inline-block;*/
+    /*padding: 6px 12px;*/
+    /*cursor: pointer;*/
+  position: relative;
+  margin-top: 8px;
+}
+
+</style>
+
+<br>
+<div>
+  <button type="button" class="btn btn-outline-info" data-toggle="modal" data-target="#exampleModal">Create Variable</button>
+</div>
+
+<br>
+
+
+
+<div>
+  <form method="POST" action = "" id="config_parser_data-form" enctype="multipart/form-data">
+                {{ form.hidden_tag() }}
+    <div>
+  <textarea name="my-xml-editor" data-editor="xml" data-gutter="1" rows="15">{{ config }}</textarea>
+  </div>
+    <br>
+  <div class="form-group">
+      {{ form.submit(class="btn btn-outline-info") }}
+      <button type= "button" class="btn btn-outline-info" data-export="export" onclick= "create_csv()">Export</button>
+        <label for="variableinput" class="btn btn-outline-info" id="custom-file-upload">Upload CSV</label>
+       {{ form.variable_csv(class="btn btn-outline-info", id="variableinput") }}
+        <select id="filenames" class="btn btn-mini">
+           <option value="" disabled selected>How do you want the files named</option>
+           {% for filename in potential_filenames %}
+           <option value= "{{ filename }}" >{{ filename }}</option>"
+           {% endfor %}
+       </select>
+        <a href="{{url_for('config_templater_bp.get_config_templates', filename= '')}}" id="download" class="btn btn-outline-info">Download</a>
+
+
+  </div>
+  </form>
+
+</div>
+
+
+<div>
+  {{ table|safe }}
+</div>
+
+
+<div class="modal fade" id="exampleModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="exampleModalLabel">Create A New Variable!</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        <form>
+          <div class="form-group">
+            <label for="new_variable" class="col-form-label">New Variable:</label>
+            <input type="text" class="form-control" id="new_variable">
+          </div>
+        </form>
+
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+        <button type="button" id= 'modal_btn' class="btn btn-primary" data-dismiss="modal" >Create Variable</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+
+
+
+{% endblock content %}
+
+{% block js %}
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.0/jquery.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/ace/1.4.7/ace.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/table2csv@1.1.4/src/table2csv.min.js"></script>
+<script>
+
+
+
+    modal_btn.onclick = function() {
+        var input = document.getElementById('new_variable').value;
+        var editor = ace.edit("myTextArea");
+        var range = editor.getSelectionRange();
+        editor.session.replace(editor.getSelectionRange(), `\{\{ ${input} \}\}`);
+        $('input[id=new_variable]').val('');
+
+  };
+
+
+  $('textarea[data-editor]').each(function() {
+    var textarea = $(this);
+    var mode = textarea.data('editor');
+    var editDiv = $('<div>', {
+      position: 'absolute',
+      'id': "myTextArea",
+      width: textarea.width(),
+      height: textarea.height(),
+      'class': textarea.attr('class')
+    }).insertBefore(textarea);
+    textarea.css('display', 'none');
+    var editor = ace.edit(editDiv[0]);
+    editor.renderer.setShowGutter(textarea.data('gutter'));
+    editor.getSession().setValue(textarea.val());
+    editor.getSession().setMode("ace/mode/" + mode);
+    editor.setTheme("ace/theme/idle_fingers");
+
+    // copy back to textarea on form submit...
+    textarea.closest('form').submit(function() {
+      textarea.val(editor.getSession().getValue());
+    })
+
+
+  });
+
+    function create_csv(){
+            $("#template_variables_table").table2csv({
+                filename:'template_variables_table.csv'
+            })}
+
+
+$("#filenames").change(function () {
+  var url_string = "{{url_for('config_templater_bp.get_config_templates', filename='')}}";
+  var filename = this.value;
+  var new_url_string = [url_string.slice(0,64), filename, url_string.slice(64)].join('');
+  $("#download").attr('href', new_url_string);
+
+
+});
+
+        </script>
+  {% endblock js %}
+
+

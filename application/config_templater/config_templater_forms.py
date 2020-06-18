@@ -9,4 +9,5 @@ import os
 
 class ConfigTemplaterForm(FlaskForm):
     variable_csv = FileField(u'Choose CSV')
-    submit = SubmitField('Go!')
+    ready = SubmitField('Ready')
+    set = SubmitField('Set')

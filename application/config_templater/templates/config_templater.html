@@ -1,6 +1,13 @@
 {% extends 'base.html' %}
 
 
+{% assets "config_templater_css_bundle" %}
+  <link href="{{ ASSET_URL }}" rel="stylesheet" type="text/css">
+{% endassets %}
+
+    {% block head %}
+
+{% endblock head %}
         {% block jumbotron_content %}
                 <h1 class="display-4">Configuration Templater</h1>
                 <nav aria-label="breadcrumb">
@@ -18,35 +25,16 @@
 <head>
     <meta charset="UTF-8">
     {% block title %}
-            <title>Configuration Templater!</title>
-        {% endblock title %}
-
+        <title>Configuration Templater!</title>
+    {% endblock title %}
 </head>
 
 
-<style>
-    textarea {
-      width: 100%;
-      height: auto;
-    }
 
-    input[type="file"] {
-    display: none;
-}
-#custom-file-upload {
-    /*border: 1px solid #ccc;*/
-    /*display: inline-block;*/
-    /*padding: 6px 12px;*/
-    /*cursor: pointer;*/
-  position: relative;
-  margin-top: 8px;
-}
-
-</style>
 
 <br>
 <div>
-  <button type="button" class="btn btn-outline-info" data-toggle="modal" data-target="#exampleModal">Create Variable</button>
+  <button type="button" class="btn btn-outline-info" data-toggle="modal" data-target="#createVariableModal">Create Variable</button>
 </div>
 
 <br>
@@ -61,9 +49,10 @@
   </div>
     <br>
   <div class="form-group">
-      {{ form.submit(class="btn btn-outline-info") }}
+      {{ form.ready(class="btn btn-outline-info") }}
       <button type= "button" class="btn btn-outline-info" data-export="export" onclick= "create_csv()">Export</button>
         <label for="variableinput" class="btn btn-outline-info" id="custom-file-upload">Upload CSV</label>
+       {{ form.set(class="btn btn-outline-info") }}
        {{ form.variable_csv(class="btn btn-outline-info", id="variableinput") }}
         <select id="filenames" class="btn btn-mini">
            <option value="" disabled selected>How do you want the files named</option>
@@ -85,11 +74,11 @@
 </div>
 
 
-<div class="modal fade" id="exampleModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+<div class="modal fade" id="createVariableModal" tabindex="-1" role="dialog" aria-labelledby="createVariableModalLabel" aria-hidden="true">
   <div class="modal-dialog" role="document">
     <div class="modal-content">
       <div class="modal-header">
-        <h5 class="modal-title" id="exampleModalLabel">Create A New Variable!</h5>
+        <h5 class="modal-title" id="createVariableModalLabel">Create A New Variable!</h5>
         <button type="button" class="close" data-dismiss="modal" aria-label="Close">
           <span aria-hidden="true">&times;</span>
         </button>
@@ -141,8 +130,8 @@
     var editDiv = $('<div>', {
       position: 'absolute',
       'id': "myTextArea",
-      width: textarea.width(),
-      height: textarea.height(),
+      // width: textarea.width(),
+      // height: textarea.height(),
       'class': textarea.attr('class')
     }).insertBefore(textarea);
     textarea.css('display', 'none');

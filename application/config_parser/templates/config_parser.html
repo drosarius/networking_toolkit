@@ -1,6 +1,17 @@
 {% extends 'base.html' %}
 
+{% block head %}
+{% assets "config_parser_css_bundle" %}
+  <link href="{{ ASSET_URL }}" rel="stylesheet" type="text/css">
+{% endassets %}
 
+<head>
+    <meta charset="UTF-8">
+    {% block title %}
+    <title>Configuration Parser</title>
+    {% endblock title %}
+</head>
+{% endblock head %}
 
 
         {% block jumbotron_content %}
@@ -16,12 +27,7 @@
 {% block content %}
 
 
-<head>
-    <meta charset="UTF-8">
-    {% block title %}
-    <title>Configuration Parser</title>
-    {% endblock title %}
-</head>
+
 
 <div>
 
@@ -40,16 +46,6 @@
   <div class="form-group">
       {{ form.submit(class="btn btn-outline-info") }}
   </div>
-        <div>
-        <label>Select Device</label>
-        <select name="device_name" id="device" onchange="get_device_info()" class="form-control form-control-lg">
-           <option value= "{{ devices[0] }}" SELECTED>{{ devices[0] }}</option>"
-           {% for device in devices[1:] %}
-           <option value= "{{ device }}" >{{ device }}</option>"
-           {% endfor %}
-       </select>
-
-    </div>
 </form>
 
 
@@ -69,46 +65,15 @@
   {% block js %}
 
 
-<script>
-
-
-        $('#parsed_config_table').DataTable({
-                dom: 'Bfrtip',
-                buttons: ['csvHtml5'],
-        });
-
-
-
-
-            function get_device_info() {
-
-                var device = document.getElementById('device').value;
-                var command = document.getElementById('cli_command').value;
-                var data = {
-                 'device' : device,
-                 'command': command
-            };
-                $.ajax({
-                  type: 'POST',
-                  url: "{{url_for('config_parser_bp.config_parser')}}",
-                  contentType: 'application/json',
-                  data: JSON.stringify(data),
-                    success: function (res, status) {
-                var html = res;
-                var myDataTable = $("#device_data_table").html(html);
-                $('#parsed_config_table').DataTable({
-                dom: 'Bfrtip',
-                buttons: ['csvHtml5'],
-        });
-
-             },
-                error: function (res) {
-                    alert(res.status)
-                }
-                });
-
+<script type="text/javascript">
+$(document).ready( function () {
+    $('#parsed_config_table').DataTable({
+                 dom: 'Bfrtip',
+                 buttons: ['csvHtml5']
     }
 
+    );
+} );
 </script>
   {% endblock js %}
 

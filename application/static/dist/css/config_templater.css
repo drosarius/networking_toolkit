@@ -1,0 +1,16 @@
+#myTextArea {
+      width: 1200px;
+      height: 500px;
+      border-radius: 10px;
+    }
+
+input[type="file"] {
+    display: none;
+
+}
+
+#custom-file-upload {
+  position: relative;
+  margin-top: 8px;
+}
+

@@ -3,28 +3,29 @@
 
 
   <head>
-    <!-- Required meta tags -->
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-    <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/v/bs4/dt-1.10.21/b-1.6.2/b-colvis-1.6.2/b-html5-1.6.2/datatables.min.css"/>
+      <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/v/bs4/dt-1.10.21/b-1.6.2/b-colvis-1.6.2/b-html5-1.6.2/datatables.min.css"/>
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css" integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh" crossorigin="anonymous">
+    <!-- Required meta tags -->
+     <meta charset="utf-8">
+    {% block head %}
+
+      <link rel="stylesheet" href="{{ url_for('static', filename='styles/main.css') }}">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
     <!-- Bootstrap CSS -->
       {% block title %}
     <title>Networking Toolkit</title>
       {% endblock title %}
   </head>
+{% endblock head %}
 
   <body>
-        <!-- As a link -->
-<!--        <nav class="navbar navbar-light bg-light">-->
-<!--            <a class="navbar-brand" href="/">Networking Toolkit</a>-->
-<!--        </nav>-->
 
         <div class="jumbotron jumbotron-fluid">
             <div class="container">
                 {% block jumbotron_content %}
                 <h1 class="display-4">Networking Toolkit</h1>
-                <p class="lead">Welcome to the Networking Toolkit. I hope this is useful for you!</p>
+                <p class="lead">Welcome to the Networking Toolkit. I hope this is useful!</p>
                 {% endblock jumbotron_content %}
             </div>
         </div>

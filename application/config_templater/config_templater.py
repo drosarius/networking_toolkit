@@ -3,43 +3,47 @@ import pandas as pd
 from zipfile import ZipFile
 import os
 
-def config_template(config):
-    with open('application/config_templater/static/uploads/saved_config_templates/test_template.txt', 'w') as f:
+def delete_old_files(paths):
+    for path in paths:
+        for subdir, dirs, files in os.walk(path):
+            for file in files:
+                filePath = os.path.join(subdir, file)
+                os.unlink(filePath)
+
+
+def get_template_variables(config):
+    with open('application/config_templater/uploads/saved_config_templates/test_template.txt', 'w') as f:
         f.write(config)
     env = Environment()
-    test = env.parse(config)
-    template_variables = list(meta.find_undeclared_variables(test))
-    template_df = pd.DataFrame(columns=template_variables)
+    parsed_config = env.parse(config)
+    result = list(meta.find_undeclared_variables(parsed_config))
+    return result
+
+
+def config_template(config):
+    template_vars = get_template_variables(config)
+    template_df = pd.DataFrame(columns=template_vars)
     return template_df.to_html(
         classes=["table", "table-bordered", "table-striped", "table-hover"],
         table_id='template_variables_table', header="true")
 
 def get_potential_filenames(config):
-    with open('application/config_templater/static/uploads/saved_config_templates/test_template.txt', 'w') as f:
-        f.write(config)
-    env = Environment()
-    test = env.parse(config)
-    template_variables = list(meta.find_undeclared_variables(test))
-    template_variables.append('index')
-    return template_variables
-
+    template_vars = get_template_variables(config)
+    template_vars.append('index')
+    return template_vars
 
 
 def display_csv(csv_input_file):
-    var_csv_df = pd.read_csv("application/config_templater/static/uploads/" + csv_input_file)
+    var_csv_df = pd.read_csv("application/config_templater/uploads/" + csv_input_file)
     return var_csv_df.to_html(
         classes=["table", "table-bordered", "table-striped", "table-hover"],
         table_id='template_variables_table', header="true")
 
 
 def config_creator(csv_input_file, filename):
-    for subdir, dirs, files in os.walk(
-            'application/config_templater/static/Zipped_Config_Templates/'):
-        for file in files:
-            filePath = os.path.join(subdir, file)
-            os.unlink(filePath)
-    var_csv_df = pd.read_csv("application/config_templater/static/uploads/" + csv_input_file)
-    with open('application/config_templater/static/uploads/saved_config_templates/test_template.txt', 'r') as f:
+    delete_old_files(['application/config_templater/static/Zipped_Config_Templates/'])
+    var_csv_df = pd.read_csv("application/config_templater/uploads/" + csv_input_file)
+    with open('application/config_templater/uploads/saved_config_templates/test_template.txt', 'r') as f:
         config_temp = f.read()
     t = Template(config_temp)
     for index, row in var_csv_df.iterrows():

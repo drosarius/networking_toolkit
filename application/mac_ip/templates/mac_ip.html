@@ -1,12 +1,16 @@
 {% extends 'base.html' %}
 
-
-
-<head>
+{% block head %}
+{% assets "mac_ip_css_bundle" %}
+  <link href="{{ ASSET_URL }}" rel="stylesheet" type="text/css">
+{% endassets %}
+    <head>
     {% block title %}
     <title>MAC to IP!</title>
     {% endblock title %}
-</head>
+    </head>
+{% endblock head %}
+
 
         {% block jumbotron_content %}
                 <h1 class="display-4">MAC to IP</h1>
@@ -34,7 +38,6 @@
   </div>
   <div class="form-group">
       {{ form.submit(class="btn btn-outline-info") }}
-<!--    <button type="button" class="btn btn-outline-info" data-export="export" onclick= "create_csv()">Export</button>-->
   </div>
 
 </form>

@@ -1,13 +1,20 @@
 import textfsm
 import pandas as pd
+import os
 
 
 
 def config_parse_to_html_table(input_file, command):
-    input_file = open("application/config_parser/uploads/" + input_file, encoding='utf-8')
-    cli_data = input_file.read()
-    input_file.close()
+    with open("application/config_parser/uploads/" + input_file, encoding='utf-8') as f:
+        cli_data = f.read()
+    try:
+        for subdir, dirs, files in os.walk(r"application/config_parser/uploads"):
+            for file in files:
+                filePath = os.path.join(subdir, file)
+                os.unlink(filePath)
 
+    except Exception as error:
+        print(error)
 
     with open("application/static/ntc_templates/" + command) as f:
         template = textfsm.TextFSM(f)

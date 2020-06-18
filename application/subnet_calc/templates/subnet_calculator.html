@@ -10,20 +10,23 @@
                 </nav>
         {% endblock jumbotron_content %}
 
-{% block content %}
 
+{% block head %}
+{% assets "subnet_calc_css_bundle" %}
+  <link href="{{ ASSET_URL }}" rel="stylesheet" type="text/css">
+{% endassets %}
     <head>
         {% block title %}
             <title>Subnet Calculator</title>
         {% endblock title %}
     </head>
-<div class="topnav">
-    <h5>Other great (better) subnet calculators</h5>
-  <a href="http://www.davidc.net/sites/default/subnets/subnets.html">
-One</a>
-  <a href="https://www.calculator.net/ip-subnet-calculator.html">Two</a>
-  <a href="http://www.subnet-calculator.com/">Three</a>
-</div>
+{% endblock head %}
+
+
+{% block content %}
+
+
+
     <form method="POST" id="subnet-form">
         <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
   <div class="form-group">
@@ -78,7 +81,6 @@ One</a>
         <script>
         function resetForm() {
             $("#subnet_table tbody tr").remove();
-        // document.getElementById("subnet-form").reset();
         }
         </script>
 
@@ -173,9 +175,6 @@ One</a>
                 table.deleteRow(current_row_index - 1);
                 $('#subnet_table tbody tr').eq(current_row_index - 1).after(html1);
                 $('#subnet_table tbody tr').eq(current_row_index).after(html2);
-
-
-
 
              },
                 error: function (res) {

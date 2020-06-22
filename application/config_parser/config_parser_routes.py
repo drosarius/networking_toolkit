@@ -1,3 +1,6 @@
+import os
+import uuid
+
 from flask import Blueprint, render_template, request, session, redirect, \
     url_for, json
 from flask import current_app as app
@@ -18,8 +21,15 @@ config_parser_bp = Blueprint('config_parser_bp', __name__,
 def config_parser():
     form = ConfigParserForm()
     if request.method == 'POST':
+        upload_path = "application/config_parser/uploads/" + \
+                      str(session["uuid"])
+        try:
+            os.makedirs(upload_path)
+        except OSError:
+            print("Failed to create User directory %s" % upload_path)
+
         input_file = request.files.get(form.inputfile.name)
-        input_file.save('application/config_parser/uploads/' + input_file.filename)
+        input_file.save(upload_path + "/" + input_file.filename)
 
         if request.get_data():
             data = json.loads(request.get_data())
@@ -28,11 +38,14 @@ def config_parser():
             cli_command_dict = dict(form.cli_command.choices)
             command = cli_command_dict.get(int(cli_command))
             table = Config_Parser.config_parse_to_html_table(device,
-                                                             command)
+                                                             command,
+                                                             upload_path)
             return table
         cli_command_dict = dict(form.cli_command.choices)
         cli_command = cli_command_dict.get(int(form.cli_command.data))
-        table = Config_Parser.config_parse_to_html_table(input_file.filename, cli_command)
+        table = Config_Parser.config_parse_to_html_table(input_file.filename,
+                                                         cli_command,
+                                                         upload_path)
         return render_template('config_parser.html', form=form, table=table)
 
     return render_template('config_parser.html', form=form)

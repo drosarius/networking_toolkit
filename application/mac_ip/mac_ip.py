@@ -1,3 +1,5 @@
+import shutil
+
 import pandas as pd
 import textfsm
 import os
@@ -8,22 +10,22 @@ pd.set_option('display.width', None)
 pd.set_option('display.max_colwidth', None)
 
 
-def delete_old_files(path):
-    for subdir, dirs, files in os.walk(path):
-        for file in files:
-            filePath = os.path.join(subdir, file)
-            os.unlink(filePath)
+def delete_old_files(upload_path):
+    try:
+        shutil.rmtree(upload_path)
+    except Exception:
+        print("Failed to delete directory %s" % upload_path)
 
 
-def mac_ip_to_html_table(mac_table, arp_table):
+def mac_ip_to_html_table(mac_table, arp_table, upload_path):
     mac_table_template ="application/static/ntc_templates/cisco_ios_show_mac-address-table.textfsm"
     arp_table_template = "application/static/ntc_templates/cisco_ios_show_ip_arp.textfsm"
 
-    mac_input_file = open("application/mac_ip/uploads/" + mac_table, encoding='utf-8')
+    mac_input_file = open(upload_path + "/" + mac_table, encoding='utf-8')
     mac_cli_data = mac_input_file.read()
     mac_input_file.close()
 
-    arp_input_file = open("application/mac_ip/uploads/" + arp_table, encoding='utf-8')
+    arp_input_file = open(upload_path + "/" + arp_table, encoding='utf-8')
     arp_cli_data = arp_input_file.read()
     arp_input_file.close()
 
@@ -43,7 +45,7 @@ def mac_ip_to_html_table(mac_table, arp_table):
     merged_df = pd.merge(mac_df, arp_df, left_on='DESTINATION_ADDRESS', right_on='MAC')
     new_merge_df = pd.merge(merged_df, oui, left_on='NEW_MAC', right_on='oui')
     final_df = new_merge_df[['DESTINATION_ADDRESS', 'VLAN', 'DESTINATION_PORT', 'ADDRESS', 'companyName']]
-    delete_old_files('application/mac_ip/uploads')
+    delete_old_files(upload_path)
     return final_df.to_html(classes=["table", "table-bordered", "table-striped", "table-hover"], table_id='mac_ip_vendor_table', header="true", index=False, border=0)
 
 

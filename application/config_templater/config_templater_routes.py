@@ -2,7 +2,7 @@ import io
 import os
 import pathlib
 import zipfile
-from flask import current_app as app, send_file
+from flask import current_app as app, send_file, url_for
 from flask import request, session, render_template, after_this_request, app, \
     Blueprint, abort
 from werkzeug.utils import secure_filename
@@ -66,6 +66,7 @@ def get_config_templates(filename):
             app.logger.error(
                 "Error removing or closing downloaded file handle", error)
         return response
+
 
     created_template_path = upload_path + "/created_templates"
     base_path = pathlib.Path(created_template_path)
